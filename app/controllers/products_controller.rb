@@ -1,6 +1,7 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: [:show, :edit, :update, :destroy]
-
+  before_action :authenticate_user!
+  before_action :check_rol, :except => [:addproducttocart]
   # GET /products
   # GET /products.json
   def index
@@ -61,6 +62,20 @@ class ProductsController < ApplicationController
     end
   end
 
+  def addproducttocart
+    product = Product.find(params[:id])
+    order = Order.find_by(user_id:current_user.id, finish: false)
+    if order.nil?
+      order = Order.new
+      order.user_id = current_user.id
+      order.total_amount = product.price
+      order.save
+    else
+      order.total_amount+=product.price
+      order.save
+    end
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_product
@@ -71,4 +86,11 @@ class ProductsController < ApplicationController
     def product_params
       params.require(:product).permit(:name, :price, :sku)
     end
+
+    def check_rol
+      if !current_user.admin?
+        redirect_to root_path
+      end
+    end
+
 end

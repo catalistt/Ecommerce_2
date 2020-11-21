@@ -1,0 +1,12 @@
+<h1>Productos</h1>
+<div class="row">
+    <%  @products.each do |p|%>
+        <div class="col-3">
+            <div class="cuadrado">
+                <p>Nombre: <%=p.name %> </p>
+                <p>Precio: <%=p.price %> </p>
+                <%= link_to 'Agregar', addtocart_path(p), method: :post %>
+            </div>
+        </div>
+    <% end %>
+</div>
